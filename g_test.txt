@@ -1,3 +1,2 @@
-S->jeM
-M->mangeC
-C->chocolat
+S->aSbSc
+S->z

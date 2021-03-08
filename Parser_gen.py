@@ -43,15 +43,19 @@ def merge_tuples(tuples):
 def gen_parse_NT(rule):
     NT = rule[0]
     code = "char* parse_" + NT + "(char* word){\n"
-    code += "char* res;\n"
+    code += "char* res = NULL;\n"
+    code += "int prev_index = analyze_index;"
     for i in range(1, len(rule)):
         current_rule = rule[i]
-        code += "if((res = parse_" + current_rule[0] + "(word)) != NULL){\n"
+        code += "if(res == NULL && (res = parse_" + current_rule[0] + "(word)) != NULL){\n"
         for j in range(1, len(current_rule)):
+            code += "if(res != NULL){\n"
             code += "res = parse_" + current_rule[j] + "(word);\n"
-            code += "if(res == NULL) return NULL;\n"
-        code += "return res;\n}\n"
-    code += "return NULL;\n}"
+            code += "if(res == NULL) analyze_index = prev_index;\n"
+            code += "}"
+        #code += "return res;\n}\n"
+        code += "}"
+    code += "return res;\n}"
     return code
 
 # Génère le code C de la fonction parsant un TERMINAL
