@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 #include "parser.h"
 int analyze_index = 0;
 void usage(char *progname)
@@ -8,6 +9,25 @@ void usage(char *progname)
     fprintf(stderr, "Command format error:\n Usage : %s <word_to_analyze>\n", progname);
     exit(EXIT_FAILURE);
 }
+
+char** str_split(char* a_str, const char a_delim, int* word_len)
+{
+    char** result    = 0;
+    size_t count     = 0;
+    char* tmp        = a_str;
+    char* last_comma = 0;
+    char delim[2];
+    delim[0] = a_delim;
+    delim[1] = 0;
+    while (*tmp){if (a_delim == *tmp){count++;last_comma = tmp;}tmp++;}
+    
+    count += last_comma < (a_str + strlen(a_str) - 1);*(word_len) = count;count++;result = malloc(sizeof(char*) * count);
+    
+    
+    if (result){size_t idx  = 0;char* token = strtok(a_str, delim);while (token){assert(idx < count);*(result + idx++) = strdup(token);token = strtok(0, delim);}assert(idx == count - 1);*(result + idx) = 0;}
+    return result;}
+
+
 char *parse_S(char *word)
 {
     char *res = NULL;
@@ -19,11 +39,13 @@ char *parse_S(char *word)
         res = parse_S(word);
         if (res == NULL)
             analyze_index = prev_index;
-        else{return res;}
+        else
+        {
+            return res;
+        }
     }
     if (res == NULL && (res = parse_a(word)) != NULL)
     {
-        
     }
     return res;
 }
@@ -42,8 +64,8 @@ int main(int argc, char *argv[])
     {
         usage(argv[0]);
     }
-    char *word = argv[1];
-    int word_len = strlen(word);
+    int word_len;
+    char **word = str_split(argv[1], ' ', &word_len);
     char *res = parse_S(word);
     if (res == NULL || word_len != analyze_index)
     {
@@ -53,5 +75,7 @@ int main(int argc, char *argv[])
     {
         printf("Le mot appartient au langage\n");
     }
+    
+
     return 0;
 }

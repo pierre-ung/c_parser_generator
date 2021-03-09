@@ -19,7 +19,10 @@ def read_grammar(filename):
     rules = content.splitlines()
     rules_couple = []
     for rule in rules:
-        rules_couple.append(tuple(rule.split("->")))
+        #Supprimer les deux premiers espace (Entre le Terminal et sa dérivation)
+        rule = rule.replace(' ', '', 2)
+        rules_couple.append(tuple(rule.split(":")))
+
     return merge_tuples(rules_couple)
 
 #  Fusionne les tuples ayant le même 1er élément (i.e fusion des règles engendrés par le même non terminal)
@@ -39,14 +42,25 @@ def merge_tuples(tuples):
     # Suppression des tuples dupliqués puis retour des tuples fusionnés
     return [i for n, i in enumerate(res) if i not in res[:n]]
 
+
+def gen_str_split():
+    code =  "char** str_split(char* a_str, const char a_delim, int* word_len){\n"
+    code += "char** result=0;size_t count=0;char* tmp=a_str;char* last_comma=0;char delim[2];delim[0]=a_delim;delim[1]=0;\n"
+    code += "while (*tmp){if (a_delim == *tmp){count++;last_comma = tmp;}tmp++;}"
+    code += "count += last_comma < (a_str + strlen(a_str) - 1);*(word_len) = count;count++;result = malloc(sizeof(char*) * count);"
+    code += "if (result){size_t idx  = 0;char* token = strtok(a_str, delim);while (token){assert(idx < count);*(result + idx++) = strdup(token);token = strtok(0, delim);}assert(idx == count - 1);*(result + idx) = 0;}"
+    code += "return result;}"
+    return code
+
+
 # Génère le code C de la fonction parsant un NON TERMINAL
 def gen_parse_NT(rule):
     NT = rule[0]
-    code = "char* parse_" + NT + "(char* word){\n"
-    code += "char* res = NULL;\n"
+    code = "char** parse_" + NT + "(char** word){\n"
+    code += "char** res = NULL;\n"
     code += "int prev_index = analyze_index;"
     for i in range(1, len(rule)):
-        current_rule = rule[i]
+        current_rule = rule[i].split(" ")
         code += "if(res == NULL && (res = parse_" + current_rule[0] + "(word)) != NULL){\n"
         for j in range(1, len(current_rule)):
             code += "if(res != NULL){\n"
@@ -60,8 +74,8 @@ def gen_parse_NT(rule):
 
 # Génère le code C de la fonction parsant un TERMINAL
 def gen_parse_T(T):
-    code = "char* parse_" + T + "(char* word){\n"
-    code += "if(word[analyze_index] ==\'" + T + "\'){\n"
+    code = "char** parse_" + T + "(char** word){\n"
+    code += "if(strcmp(word[analyze_index], \"" + T + "\") == 0){\n"
     code += "analyze_index++;\n"
     code += "return word;}\n"
     code += "return NULL;\n}"
@@ -76,11 +90,12 @@ def gen_parse(rules):
         # Genrere les fonctions associés aux NT engendrant les règles
         code += gen_parse_NT(rule)
         for compo in rule[1:]:
-            for char in compo:
+            compo = compo.split(' ')
+            for c in compo:
                 # Genere les fonctions associés aux terminaux
-                if(char.islower() and char not in already_gen):
-                    code += gen_parse_T(char)
-                    already_gen.append(char)
+                if(not c[0].isupper() and c not in already_gen):
+                    code += gen_parse_T(c)
+                    already_gen.append(c)
     return code            
 
 # Génération du code du fichier .h
@@ -89,12 +104,15 @@ def gen_h_code(rules):
     code = ""
     for rule in rules : 
         for compo in rule :
+            compo = compo.split(" ")
             for char in compo :
                 if(char not in already_gen):
-                    code += "char *parse_" + char + "(char *word);\n"
+                    code += "char **parse_" + char + "(char **word);\n"
                     already_gen.append(char)
     return code
                 
+
+        
 
 ################################################# Script #################################################
 # Vérification des arguments
@@ -117,6 +135,7 @@ rules = read_grammar(filename)
 c_header =  "#include <stdlib.h>\n"
 c_header += "#include <stdio.h>\n"
 c_header += "#include <string.h>\n"
+c_header += "#include <assert.h>\n"
 c_header += "#include \"" + output_name + ".h\"\n"
 c_header += "int analyze_index = 0;\n"
 
@@ -124,15 +143,15 @@ c_header += "int analyze_index = 0;\n"
 c_usage = "void usage(char *progname){\n"
 c_usage += "fprintf(stderr, \"Command format error:\\n Usage : %s <word_to_analyze>\\n\", progname); exit(EXIT_FAILURE);}\n"
 
-# Generation des fonctions parse_X
-c_functions = gen_parse(rules) + "\n"
+# Generation des fonctions auxilliaires et parse_X
+c_functions = gen_str_split() + gen_parse(rules) + "\n"
 
 # Génération du main
 c_main = "int main(int argc, char *argv[]){\n"
 c_main += "if (argc != 2){usage(argv[0]);}\n"
-c_main += "char *word = argv[1];\n"
-c_main += "int word_len = strlen(word);\n"
-c_main += "char *res = parse_" + rules[0][0] + "(word);\n"
+c_main += "int word_len;\n"
+c_main += "char **word = str_split(argv[1], ' ', &word_len);\n"
+c_main += "char **res = parse_" + rules[0][0] + "(word);\n"
 c_main += "if (res == NULL || word_len != analyze_index){printf(\"Le mot n'appartient pas au langage engendré par la grammaire\\n\");}\n"
 c_main += "else{printf(\"Le mot appartient au langage\\n\");}\n"
 c_main += "return 0;}\n"
