@@ -1,3 +1,2 @@
 S : a S b
-S : c S b
-S : a
+S : c
