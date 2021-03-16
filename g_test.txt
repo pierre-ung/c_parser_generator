@@ -1,6 +1,6 @@
-S : a S B : printf("first rule");
-S : c : printf("S = c");
-S : a : printf("S = a");
-B : b : printf("B = b");
-B : x : printf("B = x");
+S : a S B : printf("first rule\n");
+S : c : printf("S = c\n");
+S : a : printf("S = a\n");
+B : b : printf("B = b\n");
+B : x : printf("B = x\n");
 B :
