@@ -1,0 +1,8 @@
+S : int
+S : string
+S : { Assoc }
+Assoc : KeyVal AssocBis
+Assoc : 
+AssocBis : , KeyVal AssocBis
+AssocBis :
+KeyVal : id = S
