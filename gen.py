@@ -1,3 +1,4 @@
+# coding=utf-8
 import sys
 
 ################################################# Fonctions #################################################
@@ -29,12 +30,16 @@ def read_grammar(filename):
     for rule in rules:
         #Supprimer les deux premiers espace (Entre le Terminal et sa dérivation)
         rule = rule.replace(' ', '', 2)
-        rule = tuple(rule.split(":"))
+        rule = list(rule.split(":"))
+        for i in range(len(rule)):
+            rule[i] = rule[i].rstrip()
         #epsilon production=
         if(len(rule[1]) == 0):
-            rule = tuple([rule[0], " "])
+            rule = list([rule[0], " "])
 
         rules_couple.append(rule)
+    print(rules_couple)
+    print(merge_tuples(rules_couple))
     return merge_tuples(rules_couple)
 
 #  Fusionne les tuples ayant le même 1er élément (i.e fusion des règles engendrés par le même non terminal)
@@ -69,7 +74,7 @@ def gen_str_split():
 def gen_parse_NT(rule):
     NT = rule[0]
     code = "char** parse_" + NT + "(char** word){\n"
-    code += "if(analyze_index >= word_len) return NULL;\n"
+    code += "if(analyze_index > word_len) return NULL;\n"
     code += "char** res = NULL;\n"
     code += "int prev_index = analyze_index;"
     for i in range(1, len(rule)):
@@ -79,12 +84,13 @@ def gen_parse_NT(rule):
             current_rule = rule[i]  
         code += "if(res == NULL && (res = parse_" + process_word(current_rule[0]) + "(word)) != NULL){\n"
         for j in range(1, len(current_rule)):
-            code += "if(res != NULL){\n"
             code += "res = parse_" + process_word(current_rule[j]) + "(word);\n"
-            code += "if(res == NULL) analyze_index = prev_index;\n"
-            code += "}"
-        #code += "return res;\n}\n"
+            code += "if(res == NULL) {\n"
+            code += "analyze_index = prev_index;\n"
+            code += "goto " + "label_" + NT + str(i) + ";\n"
+            code += "}\n"
         code += "}"
+        code += "label_" + NT + str(i) + ":\n"
     code += "return res;\n}"
     return code
 
@@ -98,6 +104,7 @@ def gen_parse_T(T):
     # Sinon :
     else:
         code += "char** parse_" + process_word(T) + "(char** word){\n"
+        code += "if (analyze_index >= word_len) return NULL;\n" # end if word len is already reached, not checked for epsilon production
         code += "if(strcmp(word[analyze_index], \"" + T + "\") == 0){\n"
         code += "analyze_index++;\n"
         code += "return word;}\n"
