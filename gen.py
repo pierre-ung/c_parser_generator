@@ -59,8 +59,32 @@ def merge_tuples(tuples):
     #print(del_left_rec([i for n, i in enumerate(res) if i not in res[:n]]))
     return del_left_rec([i for n, i in enumerate(res) if i not in res[:n]])
 
+def del_useless(liste):
+    fini = False
+    while not fini:
+        liste_N_terminaux = set([liste[i][0] for i in range(len(liste))])
+        new_liste = []
+        fini = True
+        for regles in liste:
+            new_rules = [regles[0]]
+            if len(regles) > 1:
+                for regle in regles[1:]:
+                    N_terminaux_regle = set([c for c in regle[0] if c.isupper()])
+                    if N_terminaux_regle.issubset(liste_N_terminaux):
+                        new_rules.append(regle)
+                    else:
+                        fini = False
+                new_liste.append(new_rules)
+                            
+            #Si il existe un terminal sans règles, on l'enlève
+            else:
+                fini = False
+        liste = new_liste
+                        
+    return liste
 def del_left_rec(liste):
 
+    liste = del_useless(liste)
     new_rules = []
     liste_terminaux = [liste[i][0] for i in range(len(liste))]
     free_terminals = []
