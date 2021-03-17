@@ -33,5 +33,5 @@ words = ["b a","b a x","b b b b b a x x x x x x x"]
 test_speed("./grammaires/g_test2.txt",words)
 
 # Grammaire 3
-words = ["b a","b a x","b b b b b a x x x x x x x"]
-test_speed("./grammaires/g_test2.txt",words)
+words = ["x x x y y y","x x y","x x x x x a a b b b b y y y y y"]
+test_speed("./grammaires/g_test3.txt",words)
