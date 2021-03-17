@@ -18,26 +18,25 @@ def process_word(w):
 def read_grammar(filename):
     # Ouvrir, lire et fermer le fichier
     try:
-        grammar = open(filename, "r")
-        content = grammar.read()
-        grammar.close()
+        with open(filename, "r") as grammar:
+            content = grammar.read()
     except:
         print("Cannot open the file " + filename)
         exit()
     # Conversion du fichier en liste de règles
     rules = content.splitlines()
+    for i in range(len(rules)):
+        rules[i] = rules[i].strip()
     rules_couple = []
     for rule in rules:
-        #Supprimer les deux premiers espace (Entre le Terminal et sa dérivation)
-        rule = rule.replace(' ', '', 2)
-        rule = list(rule.split(":"))
-        for i in range(len(rule)):
-            rule[i] = rule[i].rstrip()
-        #epsilon production=
-        if(len(rule[1]) == 0):
-            rule = list([rule[0], " "])
-
-        rules_couple.append(rule)
+        if len(rule)>0:
+            rule = rule.split(":")
+            for i in range(len(rule)):
+                rule[i] = rule[i].strip()
+            #epsilon production=
+            if(len(rule[1]) == 0):
+                rule = [rule[0], " "]
+            rules_couple.append(rule)
     return merge_tuples(rules_couple)
 
 #  Fusionne les tuples ayant le même 1er élément (i.e fusion des règles engendrés par le même non terminal)
@@ -59,8 +58,32 @@ def merge_tuples(tuples):
     #print(del_left_rec([i for n, i in enumerate(res) if i not in res[:n]]))
     return del_left_rec([i for n, i in enumerate(res) if i not in res[:n]])
 
+def del_useless(liste):
+    fini = False
+    while not fini:
+        liste_N_terminaux = set([liste[i][0] for i in range(len(liste))])
+        new_liste = []
+        fini = True
+        for regles in liste:
+            new_rules = [regles[0]]
+            if len(regles) > 1:
+                for regle in regles[1:]:
+                    N_terminaux_regle = set([c for c in regle[0] if c.isupper()])
+                    if N_terminaux_regle.issubset(liste_N_terminaux):
+                        new_rules.append(regle)
+                    else:
+                        fini = False
+                new_liste.append(new_rules)
+                            
+            #Si il existe un terminal sans règles, on l'enlève
+            else:
+                fini = False
+        liste = new_liste
+                        
+    return liste
 def del_left_rec(liste):
 
+    liste = del_useless(liste)
     new_rules = []
     liste_terminaux = [liste[i][0] for i in range(len(liste))]
     free_terminals = []
@@ -119,7 +142,7 @@ def gen_parse_NT(rule):
     code += "int prev_index = analyze_index;"
     for i in range(1, len(rule)):
         if(rule[i][0] != " "):
-            current_rule = rule[i][0].split(" ")
+            current_rule = rule[i][0].split()
         else:
             current_rule = rule[i][0]
         code += "if(res == NULL && (res = parse_" + process_word(current_rule[0]) + "(word)) != NULL){\n"
@@ -164,7 +187,7 @@ def gen_parse(rules):
         for compo in rule[1:]:
             # Si ce n'est pas une regle X -> epsilon
             if compo[0] != " ":
-                compo[0] = compo[0].split(' ')
+                compo[0] = compo[0].split()
             for c in compo[0]:
                 # Genere les fonctions associés aux terminaux
                 if(not c[0].isupper() and c not in already_gen):
@@ -223,7 +246,10 @@ c_functions = gen_str_split() + gen_parse(rules) + "\n"
 # Génération du main
 c_main = "int main(int argc, char *argv[]){\n"
 c_main += "if (argc != 2){usage(argv[0]);}\n"
-c_main += "char **word = str_split(argv[1], ' ', &word_len);\n"
+c_main += "char ** word;"
+c_main += "if(strcmp(argv[1], \" \") == 0){word = malloc(1*sizeof(char));word[0] = \" \";word_len = 0;}\n"
+c_main += "else\n"
+c_main += "word = str_split(argv[1], ' ', &word_len);\n"
 c_main += "char **res = parse_" + rules[0][0] + "(word);\n"
 c_main += "if (res == NULL || word_len != analyze_index){printf(\"KO\\n\");}\n"
 c_main += "else{printf(\"OK\\n\");}\n"
