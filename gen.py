@@ -18,26 +18,25 @@ def process_word(w):
 def read_grammar(filename):
     # Ouvrir, lire et fermer le fichier
     try:
-        grammar = open(filename, "r")
-        content = grammar.read()
-        grammar.close()
+        with open(filename, "r") as grammar:
+            content = grammar.read()
     except:
         print("Cannot open the file " + filename)
         exit()
     # Conversion du fichier en liste de règles
     rules = content.splitlines()
+    for i in range(len(rules)):
+        rules[i] = rules[i].strip()
     rules_couple = []
     for rule in rules:
-        #Supprimer les deux premiers espace (Entre le Terminal et sa dérivation)
-        rule = rule.replace(' ', '', 2)
-        rule = list(rule.split(":"))
-        for i in range(len(rule)):
-            rule[i] = rule[i].rstrip()
-        #epsilon production=
-        if(len(rule[1]) == 0):
-            rule = list([rule[0], " "])
-
-        rules_couple.append(rule)
+        if len(rule)>0:
+            rule = rule.split(":")
+            for i in range(len(rule)):
+                rule[i] = rule[i].strip()
+            #epsilon production=
+            if(len(rule[1]) == 0):
+                rule = [rule[0], " "]
+            rules_couple.append(rule)
     return merge_tuples(rules_couple)
 
 #  Fusionne les tuples ayant le même 1er élément (i.e fusion des règles engendrés par le même non terminal)
@@ -143,7 +142,7 @@ def gen_parse_NT(rule):
     code += "int prev_index = analyze_index;"
     for i in range(1, len(rule)):
         if(rule[i][0] != " "):
-            current_rule = rule[i][0].split(" ")
+            current_rule = rule[i][0].split()
         else:
             current_rule = rule[i][0]
         code += "if(res == NULL && (res = parse_" + process_word(current_rule[0]) + "(word)) != NULL){\n"
@@ -188,7 +187,7 @@ def gen_parse(rules):
         for compo in rule[1:]:
             # Si ce n'est pas une regle X -> epsilon
             if compo[0] != " ":
-                compo[0] = compo[0].split(' ')
+                compo[0] = compo[0].split()
             for c in compo[0]:
                 # Genere les fonctions associés aux terminaux
                 if(not c[0].isupper() and c not in already_gen):
