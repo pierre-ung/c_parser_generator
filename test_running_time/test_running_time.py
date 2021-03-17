@@ -26,7 +26,7 @@ def test_speed(path_grammaire, path_words):
         print("\ntest word : "+word)
         timeStarted = time.time()                                 # Sauvegarde du temps de départ
 
-        subprocess.run([".\\parserToTest",word])                  # Execution du parser avec sur un mot
+        subprocess.run(["./parserToTest",word])                  # Execution du parser avec sur un mot
 
         timeDelta = time.time() - timeStarted                     # Temps d'execution
         print("Finished process in "+str(timeDelta)+" seconds.") 
