@@ -2,5 +2,5 @@ S : a S B : printf("first rule\n");
 S : c : printf("S = c\n");
 S : a : printf("S = a\n");
 B : b : printf("B = b\n");
-B : x : printf("B = x\n");
+B : B x : printf("B = x\n");
 B :

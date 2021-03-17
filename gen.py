@@ -56,7 +56,48 @@ def merge_tuples(tuples):
                     tmp_tuple.append([t[1], ""])
         res.append(tmp_tuple)
     # Suppression des tuples dupliqués puis retour des tuples fusionnés
-    return [i for n, i in enumerate(res) if i not in res[:n]]
+    #print(del_left_rec([i for n, i in enumerate(res) if i not in res[:n]]))
+    return del_left_rec([i for n, i in enumerate(res) if i not in res[:n]])
+
+def del_left_rec(liste):
+
+    new_rules = []
+    liste_terminaux = [liste[i][0] for i in range(len(liste))]
+    free_terminals = []
+    
+    #On vérifie quels terminaux ne sont pas encore utilisés par la grammaire
+    for i in range(26):
+        if chr(65+i) not in liste_terminaux:
+            free_terminals.append(chr(65+i))
+            
+    for regle in liste:
+        liste_left_rec = []
+        liste_no_rec = []
+        non_terminal = regle[0]
+        for i in range(1,len(regle)):
+            if regle[i][0][0] == non_terminal:
+                liste_left_rec.append(regle[i])
+            else :
+                liste_no_rec.append(regle[i])
+        if liste_left_rec != []:
+            new_terminal = free_terminals.pop()
+            temp = []
+            for b in liste_no_rec:
+                temp.append([(b[0] + " " + new_terminal).strip(), b[1]])
+            tuple_B = temp+liste_no_rec
+            tuple_A = []
+            for A in liste_left_rec:
+                if A[0] == non_terminal:
+                    tuple_A.append([A[0].replace(non_terminal, " ", 1),A[1]])
+                else:
+                    tuple_A.append([A[0].replace(non_terminal, "", 1).strip(),A[1]])
+                tuple_A.append([(A[0].replace(non_terminal, "", 1) + " " + new_terminal).strip(),A[1]])
+            #tuple_A = tuple(tuple_A)
+            new_rules.append([new_terminal] + sorted(tuple_A, key = lambda x : -len(x[0])))
+            new_rules.append([non_terminal] + sorted(tuple_B, key = lambda x : -len(x[0])))
+        else:
+            new_rules.append(regle)
+    return new_rules
 
 
 def gen_str_split():
@@ -129,7 +170,7 @@ def gen_parse(rules):
                 if(not c[0].isupper() and c not in already_gen):
                     code += gen_parse_T(c)
                     already_gen.append(c)
-    return code            
+    return code     
 
 # Génération du code du fichier .h
 def gen_h_code(rules):
