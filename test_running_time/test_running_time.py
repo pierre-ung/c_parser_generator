@@ -23,7 +23,7 @@ def test_speed(path_grammaire, path_words):
     words = content.splitlines()
 
     for word in words:                                            # Boucle testant le temps d'execution des mots passé en argument
-        print("\nTest on word : "+word)
+        print("\ntest word : "+word)
         timeStarted = time.time()                                 # Sauvegarde du temps de départ
 
         subprocess.run([".\\parserToTest",word])                  # Execution du parser avec sur un mot
