@@ -49,6 +49,6 @@ Gestion des actions
 ## Tests effectués et performances
 Dans le répertoire test_running_time, le script python test_running_time.py execute une fonction générant un parser pour une grammaire donnée et l'exécutant pour chaque mots donné. Pour chacun des mots, le temps d'exécution est affiché.
 Pour chacun des cas testé le temps d'exécution demeure sensiblement constant, et plutôt faible (cf capture d'écran ci-dessous)
-![Screenshot](image/screenshot_running_time.png)
+![Screenshot](https://github.com/pierre-ung/c_parser_generator/tree/main/images/screenshot_running_time.png)
 ## Limites
 Plusieurs espaces entre deux non terminaux = Segfault
