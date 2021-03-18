@@ -127,7 +127,7 @@ def gen_str_split():
     code =  "char** str_split(char* a_str, const char a_delim, int* word_len){\n"
     code += "char** result=0;size_t count=0;char* tmp=a_str;char* last_comma=0;char delim[2];delim[0]=a_delim;delim[1]=0;\n"
     code += "while (*tmp){if (a_delim == *tmp){count++;last_comma = tmp;}tmp++;}"
-    code+="	if (strlen(a_str) == count) {result = malloc(sizeof(char)*1); result[0] = \"\"; return result;}"
+    code += "if (strlen(a_str) == count) {result = malloc(sizeof(char)*1); result[0] = \"\"; return result;}"
     code += "count += last_comma < (a_str + strlen(a_str) - 1);*(word_len) = count;count++;result = malloc(sizeof(char*) * count);"
     code += "if (result){size_t idx  = 0;char* token = strtok(a_str, delim);while (token){assert(idx < count);*(result + idx++) = strdup(token);token = strtok(0, delim);}assert(idx == count - 1);*(result + idx) = 0;}"
     code += "return result;}"
@@ -153,11 +153,51 @@ def gen_parse_NT(rule):
             code += "analyze_index = prev_index;\n"
             code += "goto " + "label_" + NT + str(i) + ";\n"
             code += "}\n"
-        code += rule[i][1] + "\n"
+        code += "add_action(\""+ NT + str(i)+"\");\n"
         code += "return res;"
         code += "}"
         code += "label_" + NT + str(i) + ":\n"
     code += "return res;\n}"
+    return code
+
+def gen_actions(rules):
+    code = ""
+    for rule in rules:
+        NT = rule[0]
+        for i in range(1,len(rule)):
+            code += "\nvoid action_" + NT + str(i) + "(void){\n"
+            code += "\t"+rule[i][1]+"\n"
+            code +="}"
+    return code
+
+#Code C permettant d'ajouter une action à la liste des actions à effectuer en fin de programme
+def gen_ajouter_actions():
+    code = """void add_action(char * label){
+    int n = strlen(actions) + 2 + strlen(label) + 1;
+    char * temp = (char*) malloc(sizeof(char)*n);
+    strcpy(temp, actions);
+    strcat(temp, label);
+    strcat(temp, " ");
+    actions = temp;
+    }
+    """
+    return code
+#Code C permettant d'effectuer les différentes actions en fin de programme
+def gen_actionneur(rules):
+    code = """void actionneur(void){
+    int nb_actions;
+    char ** tab_actions = str_split(actions, ' ', &nb_actions);
+    int i;
+    for (i = nb_actions - 1; i > -1; i--){"""
+    for rule in rules:
+        NT = rule[0]
+        for i in range(1,len(rule)):
+            code += """if (strcmp(tab_actions[i],\"""" + NT + str(i) + "\") == 0){" + rule[i][1] +"}"
+    code +=  """
+        }
+    }
+
+    """
     return code
 
 # Génère le code C de la fonction parsant un TERMINAL
@@ -234,7 +274,7 @@ c_header += "#include <stdio.h>\n"
 c_header += "#include <string.h>\n"
 c_header += "#include <assert.h>\n"
 c_header += "#include \"" + output_name + ".h\"\n"
-c_header += "int analyze_index = 0; int word_len = 0;\n"
+c_header += "int analyze_index = 0; int word_len = 0; char* actions = \"\";\n"
 
 
 # Génération du code de la fonction Usage
@@ -242,18 +282,16 @@ c_usage = "void usage(char *progname){\n"
 c_usage += "fprintf(stderr, \"Command format error:\\n Usage : %s <word_to_analyze>\\n\", progname); exit(EXIT_FAILURE);}\n"
 
 # Generation des fonctions auxilliaires et parse_X
-c_functions = gen_str_split() + gen_parse(rules) + "\n"
+c_functions = gen_str_split() + gen_ajouter_actions() + gen_parse(rules) + gen_actionneur(rules) + gen_actions(rules) + "\n"
 
 # Génération du main
 c_main = "int main(int argc, char *argv[]){\n"
 c_main += "if (argc != 2){usage(argv[0]);}\n"
 c_main += "char ** word;"
-c_main += "if(strcmp(argv[1], \" \") == 0){word = malloc(1*sizeof(char));word[0] = \" \";word_len = 0;}\n"
-c_main += "else\n"
 c_main += "word = str_split(argv[1], ' ', &word_len);\n"
 c_main += "char **res = parse_" + rules[0][0] + "(word);\n"
 c_main += "if (res == NULL || word_len != analyze_index){printf(\"KO\\n\");}\n"
-c_main += "else{printf(\"OK\\n\");}\n"
+c_main += "else{actionneur();printf(\"OK\\n\");}\n"
 c_main += "for(int i=0; i<word_len; i++){free(word[i]);}free(word);\n"
 c_main += "return 0;}\n"
 
