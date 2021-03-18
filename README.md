@@ -17,7 +17,9 @@
 
 ## Présentation
 Dans le cadre de l'U.E Automates et Langages (INSA Toulouse), nous avons réalisé un programme générant des parser de Context-Free Grammar.
+
 **Groupe** : 4IR - B1 
+
 **Étudiants** : Alexandre Gonzalvez, Benjamin Vendeville, Jasper Güldenstein, Marino Benassai, Mikhail Zakharov, Fabien Castilla, Pierre Ung
 
 ## Utilisation
