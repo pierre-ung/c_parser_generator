@@ -68,7 +68,8 @@ def del_useless(liste):
             new_rules = [regles[0]]
             if len(regles) > 1:
                 for regle in regles[1:]:
-                    N_terminaux_regle = set([c for c in regle[0] if c.isupper()])
+                    mots = regle[0].split()
+                    N_terminaux_regle = set([c for c in mots if c[0].isupper()])
                     if N_terminaux_regle.issubset(liste_N_terminaux):
                         new_rules.append(regle)
                     else:
