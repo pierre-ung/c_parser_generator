@@ -20,7 +20,17 @@ Dans le cadre de l'U.E Automates et Langages (INSA Toulouse), nous avons réalis
 ### Pré-requis
 Version de python
 ### Spécification de la grammaire
-Expliquer le format à utiliser pour spécifier une grammaire ( rédirer une "grammaire type" comme T : ... : Action)
+Pour spécifier une grammaire il faut rédiger la grammaire dans un fichier texte sous le format suivant :
+
+    NT : t NT [: Action]
+    NT : NT2 [: Action]
+    NT2 : a b [: Action]
+    ect... 
+
+Remarques : 
+Mettre une action à effectuer est optionnel
+
+
 
 ### Lancement rapide
 Expliquer ce que fait le makefile
@@ -28,15 +38,15 @@ Expliquer ce que fait le makefile
     make
 
 ### Lancement personnalisé
-Le générateur de parser est un script Python générant un code C (le parser). Pour générer .... 
+Le générateur de parser est un script Python générant un code C (le parser). Pour générer le parser :
 
     python gen.py <fichier grammaire> [fichier_sortie=parser]
 
-Ensuite, compiler ... 
+Ensuite, compiler le fichier C généré : 
 
     gcc <fichier_généré.c> -o [nom_executable]
 
-Pour lancer le parser ..... 
+Pour lancer le parser sur un mot à analyser :
 
     ./nom_executable <mot à analyser>
 
@@ -51,5 +61,6 @@ Dans le répertoire test_running_time, le script python test_running_time.py app
 L'appel de l'executable semble prendre la majorité du temps, car peut importe la grammaire ou la longueur du mot à reconnaître le temps d'exécution reste similaire (cf capture d'écran ci-dessous)
 ![Capture d'écran de l'exécution du script test_running_time.py](/images/screenshot_running_time.JPG)
 Remarque: Sur certain système d'exploitation comme windows on trouve un temps d'exécution plus long pour le premier mot testé de chaque grammaire. Le fichier exécutable est sans doute stocké dans la mémoire vive.
+
 ## Limites
 Plusieurs espaces entre deux non terminaux = Segfault
