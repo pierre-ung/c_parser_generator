@@ -33,13 +33,13 @@ Le programme a été développé et testé  avec :
 *Il est probable qu'il fonctionne aussi avec des versions antérieurs* 
 
 ### Spécification de la grammaire
-Pour spécifier une grammaire il faut rédiger la grammaire dans un fichier texte sous le format suivant :
+Pour spécifier une grammaire, il faut rédiger la grammaire dans un fichier texte sous le format suivant :
 
     NT : t NT [: Action]
     NT : NT2 [: Action]
     NT2 : a b [: Action]
     ect... 
-**L'axiome** de la grammaire est le terminale de la **première règle** décrite (ici, NT).
+**L'axiome** de la grammaire est le terminal de la **première règle** décrite (ici, NT).
 Exemple de grammaire à fournir en entrée :
 
     S : a S b : printf("S");
@@ -49,16 +49,17 @@ Exemple de grammaire à fournir en entrée :
     X : 
 
 **Remarques :** 
-Définir une action à effectuer est optionnel. Une action doit être écrite en C.
+Définir une action à effectuer est optionnel. Une action doit être une suite d'instructions C valides, écrite sur une seule ligne.
+Par exemple : ```c int i; i = 0; printf("%d\n",i);```
 
 
 
 ### Lancement rapide
-Pour générer un parser par défaut, parsant la grammaire du fichier g_test.txt, l’exécutable sera nommé *parser*  :
+Pour générer un parser par défaut, parsant la grammaire du fichier g_test.txt, et générant un exécutable *parser*  :
 
     make
     
-Pour générer un parser en fonction d'une autre grammaire : 
+Pour générer un parser à partir d'une autre grammaire : 
 
     make gen in=<grammaire_in> out=<nom_executable_out>
     
@@ -79,12 +80,13 @@ Ensuite, compilez le fichier C généré :
 Pour lancer le parser généré sur un mot à analyser :
 
     ./nom_executable <mot à analyser>
-Si le mot appartient au langage engendré par la grammaire, **OK** s'affiche. Sinon, **KO** s'affiche. 
+Si le mot appartient au langage engendré par la grammaire, **OK** s'affiche, et les actions précisées pour chaque règle sont effectuées.
+Sinon, **KO** s'affiche. 
 
 ## Précisions techniques
 
- - Dans le script Python, nous modifiant la grammaire pour y supprimer les récursivités gauches directes (sans changer le langage engendré)
- -  Afin d'analyser un mot, il est séparé en un tableau de chaînes de caractères, correspondants aux terminaux séparés par un espace.
+ - Dans le script Python, nous modifions la grammaire pour y supprimer les récursivités gauches directes et les règles inutiles (sans changer le langage engendré).
+ - Afin d'analyser un mot, il est séparé en un tableau de chaînes de caractères, correspondants aux terminaux séparés par un espace.
  - Pour l'analyse d'un mot, on dispose d'un curseur (analyse_index) indiquant la progression de l'analyse.
  - Les actions ne s'effectuent que si le mot est reconnu. 
 
@@ -94,13 +96,14 @@ Pour lancer les tests :
     cd test_running_time/
     python3 test_running_time.py
 
-Dans le répertoire test_running_time, le script python test_running_time.py appel une fonction générant un parser pour une grammaire donnée et exécutant ce parser avec les mots donné. Pour chacun de ces mots, le temps d'exécution, le résultat attendu et le résultat obtenu sont affichés.
-L'appel de l’exécutable par l’interpréteur python semble prendre la majorité du temps, car peut importe la grammaire ou la longueur du mot à reconnaître le temps d'exécution reste similaire (cf capture d'écran ci-dessous)
+Dans le répertoire test_running_time, le script python test_running_time.py appelle une fonction générant un parser pour une grammaire donnée et exécutant ce parser avec les mots donnés. Pour chacun de ces mots, le temps d'exécution, le résultat attendu et le résultat obtenu sont affichés.
+L'appel de l’exécutable par l’interpréteur python semble prendre la majorité du temps, car peu importe la grammaire ou la longueur du mot à reconnaître le temps d'exécution reste similaire (cf capture d'écran ci-dessous)
 ![Capture d'écran de l'exécution du script test_running_time.py](/images/screenshot_running_time.JPG)
 
-**Remarque**: Sur certain système d'exploitation comme Windows on trouve un temps d'exécution plus long pour le premier mot testé de chaque grammaire. Le fichier exécutable est sans doute stocké dans la mémoire vive.
+**Remarque**: Sur certains systèmes d'exploitation comme Windows on trouve un temps d'exécution plus long pour le premier mot testé de chaque grammaire. Le fichier exécutable est sans doute stocké dans la mémoire vive.
 
 ## Limites
 
- - Lorsque l'on spécifie un mot à analyser, il faut au maximum un espace entre les terminaux
- - Pas de backtracking  
+ - Lorsque l'on spécifie un mot à analyser, il faut exactement un espace entre les terminaux
+ - Pas de backtracking
+ - Pas de prise en charge de la récursivité gauche indirecte
