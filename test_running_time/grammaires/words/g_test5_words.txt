@@ -1,6 +1,9 @@
-int
-{ }
-{ id = int }
-{ id = int , id = string }
-{ id = int , id = { id = string , id = int } }
-{ id = int , id = { id = int , id = { } } } 
+int : OK
+{ } : OK
+{ id = int } : OK
+{ id = int , id = string } : OK
+{ id = int , id = { id = string , id = int } } : OK
+{ id = int , id = { id = int , id = { } } } : OK
+{ int } : KO
+id = int : KO
+{ id = string , } : KO
