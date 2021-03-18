@@ -3,8 +3,7 @@ import sys
 
 ################################################# Fonctions #################################################
 
-# Lis un fichier contenant une grammaire de type 2 (format : S -> XY)
-#  Retourne un tableau des règles de la grammaire
+
 
 # Rend les caractères d'un mot utilisable en C (par ex : '{', ';', ...)
 def process_word(w):
@@ -18,6 +17,8 @@ def process_word(w):
             res = res.replace(c, "_" + str(ord(c)))
     return res
 
+# Lis un fichier contenant une grammaire de type 2 (format : S : XY : Action)
+#  Retourne un tableau des règles de la grammaire
 def read_grammar(filename):
     # Ouvrir, lire et fermer le fichier
     try:
@@ -85,6 +86,8 @@ def del_useless(liste):
         liste = new_liste
                         
     return liste
+
+#Supprime la recusivite gauche direct d'une grammaire
 def del_left_rec(liste):
 
     liste = del_useless(liste)
@@ -126,7 +129,7 @@ def del_left_rec(liste):
             new_rules.append(regle)
     return new_rules
 
-
+#Genere la fonction C str_split, pour séparer une chaine de caracteres en un tableau de chaines de caracteres
 def gen_str_split():
     code =  "char** str_split(char* a_str, const char a_delim, int* word_len){\n"
     code += "char** result=0;size_t count=0;char* tmp=a_str;char* last_comma=0;char delim[2];delim[0]=a_delim;delim[1]=0;\n"
