@@ -6,7 +6,6 @@ import sys
 # Lis un fichier contenant une grammaire de type 2 (format : S -> XY)
 #  Retourne un tableau des règles de la grammaire
 
-
 # Rend les caractères d'un mot utilisable en C (par ex : '{', ';', ...)
 def process_word(w):
     res = w
@@ -152,12 +151,12 @@ def gen_parse_NT(rule):
             code += "res = parse_" + process_word(current_rule[j]) + "(word);\n"
             code += "if(res == NULL) {\n"
             code += "analyze_index = prev_index;\n"
-            code += "goto " + "label_" + NT + str(i) + ";\n"
+            code += "goto " + "label_" + NT + "_" + str(i) + ";\n"
             code += "}\n"
-        code += "add_action(\""+ NT + str(i)+"\");\n"
+        code += "add_action(\""+ NT + "_" + str(i)+"\");\n"
         code += "return res;"
         code += "}"
-        code += "label_" + NT + str(i) + ":\n"
+        code += "label_" + NT + "_" + str(i) + ":\n"
     code += "return res;\n}"
     return code
 
@@ -166,7 +165,7 @@ def gen_actions(rules):
     for rule in rules:
         NT = rule[0]
         for i in range(1,len(rule)):
-            code += "\nvoid action_" + NT + str(i) + "(void){\n"
+            code += "\nvoid action_" + NT + "_" + str(i) + "(void){\n"
             code += "\t"+rule[i][1]+"\n"
             code +="}"
     return code
@@ -193,7 +192,7 @@ def gen_actionneur(rules):
     for rule in rules:
         NT = rule[0]
         for i in range(1,len(rule)):
-            code += """if (strcmp(tab_actions[i],\"""" + NT + str(i) + "\") == 0){" + rule[i][1] +"}"
+            code += """if (strcmp(tab_actions[i],\"""" + NT + "_" + str(i) + "\") == 0){" + rule[i][1] +"}"
     code +=  """
         }
     }
@@ -266,6 +265,14 @@ except:
     output_name = "parser"
 
 rules = read_grammar(filename)
+
+#On vérifie que _ n'est pas utilisé dans les non-terminaux
+for rule in rules:
+    NT = rule[0]
+    for c in NT:
+        if c == "_":
+            print("The character _ cannot be used inside the name of a non-terminal.")
+            sys.exit()
 
 #### Génération du code des fichiers .c et .h
 ###Génération du code .c
