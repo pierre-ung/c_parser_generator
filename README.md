@@ -47,9 +47,9 @@ autre ???
 Gestion des actions
 
 ## Tests effectués et performances
-Dans le répertoire test_running_time, le script python test_running_time.py execute une fonction générant un parser pour une grammaire donnée et l'exécutant avec les mots. Pour chacun de ces mots, le temps d'exécution est affiché.
+Dans le répertoire test_running_time, le script python test_running_time.py appel une fonction générant un parser pour une grammaire donnée et exécutant ce parser avec les mots donné. Pour chacun de ces mots, le temps d'exécution est affiché.
 L'appel de l'executable semble prendre la majorité du temps, car peut importe la grammaire ou la longueur du mot à reconnaître le temps d'exécution reste similaire (cf capture d'écran ci-dessous)
 ![Capture d'écran de l'exécution du script test_running_time.py](/images/screenshot_running_time.JPG)
-Remarque: Sur certain système d'exploitation comme windows on trouve un temps d'exécution plus long pour le premier mot testé de chaque grammaire.
+Remarque: Sur certain système d'exploitation comme windows on trouve un temps d'exécution plus long pour le premier mot testé de chaque grammaire. Le fichier exécutable est sans doute stocké dans la mémoire vive.
 ## Limites
 Plusieurs espaces entre deux non terminaux = Segfault
