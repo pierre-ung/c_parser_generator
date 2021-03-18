@@ -47,8 +47,8 @@ autre ???
 Gestion des actions
 
 ## Tests effectués et performances
-Dans le répertoire test_running_time, le script python test_running_time.py execute une fonction générant un parser pour une grammaire donnée et l'exécutant pour chaque mots donné. Pour chacun des mots, le temps d'exécution est affiché.
-Pour chacun des cas testé le temps d'exécution demeure sensiblement constant, et plutôt faible (cf capture d'écran ci-dessous)
-![Capture d'écran de l'exécution du script test_running_time.py](/images/screenshot_running_time.jpg)
+Dans le répertoire test_running_time, le script python test_running_time.py execute une fonction générant un parser pour une grammaire donnée et l'exécutant avec les mots. Pour chacun de ces mots, le temps d'exécution est affiché.
+Chacun des cas testé le temps d'exécution demeure sensiblement constant, et plutôt faible (cf capture d'écran ci-dessous)
+![Capture d'écran de l'exécution du script test_running_time.py](/images/screenshot_running_time.JPG)
 ## Limites
 Plusieurs espaces entre deux non terminaux = Segfault
