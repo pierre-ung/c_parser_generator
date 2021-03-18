@@ -1,5 +1,6 @@
 
 
+
 # Projet Automates et Langages
 ## Sommaire
 - [Présentation](#présentation)
@@ -66,7 +67,7 @@ Pour supprimer les fichiers intermédiaires (.c et .h) :
 ### Lancement manuel
 Le générateur de parser est un script Python générant un code C (le parser). Pour générer le parser :
 
-    python gen.py <fichier grammaire> [nom_fichier_c_out=parser]
+    python3 gen.py <fichier grammaire> [nom_fichier_c_out=parser]
 
 Ensuite, compilez le fichier C généré : 
 
@@ -86,9 +87,15 @@ Si le mot appartient au langage engendré par la grammaire, **OK** s'affiche. Si
  - Les actions ne s'effectuent que si le mot est reconnu. 
 
 ## Tests effectués et performances
+Pour lancer les tests : 
+
+    cd test_running_time/
+    python3 test_running_time.py
+
 Dans le répertoire test_running_time, le script python test_running_time.py appel une fonction générant un parser pour une grammaire donnée et exécutant ce parser avec les mots donné. Pour chacun de ces mots, le temps d'exécution, le résultat attendu et le résultat obtenu sont affichés.
 L'appel de l’exécutable par l’interpréteur python semble prendre la majorité du temps, car peut importe la grammaire ou la longueur du mot à reconnaître le temps d'exécution reste similaire (cf capture d'écran ci-dessous)
 ![Capture d'écran de l'exécution du script test_running_time.py](/images/screenshot_running_time.JPG)
+
 **Remarque**: Sur certain système d'exploitation comme Windows on trouve un temps d'exécution plus long pour le premier mot testé de chaque grammaire. Le fichier exécutable est sans doute stocké dans la mémoire vive.
 
 ## Limites
