@@ -9,9 +9,13 @@ import sys
 # Rend les caractères d'un mot utilisable en C (par ex : '{', ';', ...)
 def process_word(w):
     res = w
-    equivalents = {"{" : "rbrack", "}" : "lbrack", ";" : "semi", "," : "comma", "=" : "eq", "(" : "lpar", ")" : "rpar", " " : "epsilon"}
+    equivalents = {"_" : "uscore", "{" : "rbrack", "}" : "lbrack", ";" : "semi", "," : "comma", "=" : "eq", "(" : "lpar", ")" : "rpar", " " : "epsilon"}
     for key in equivalents:
-        res = res.replace(key, equivalents[key])
+        res = res.replace(key, "_" + equivalents[key])
+    res2 = res   
+    for c in res2:
+        if not (ord("0") <= ord(c) <= ord("9") or ord("a") <= ord(c) <= ord("z") or ord("A") <= ord(c) <= ord("Z")):
+            res = res.replace(c, "_" + str(ord(c)))
     return res
 
 def read_grammar(filename):
@@ -137,7 +141,7 @@ def gen_str_split():
 # Génère le code C de la fonction parsant un NON TERMINAL
 def gen_parse_NT(rule):
     NT = rule[0]
-    code = "char** parse_" + NT + "(char** word){\n"
+    code = "char** parse_" + process_word(NT) + "(char** word){\n"
     code += "if(analyze_index > word_len) return NULL;\n"
     code += "char** res = NULL;\n"
     code += "int prev_index = analyze_index;"
@@ -151,12 +155,12 @@ def gen_parse_NT(rule):
             code += "res = parse_" + process_word(current_rule[j]) + "(word);\n"
             code += "if(res == NULL) {\n"
             code += "analyze_index = prev_index;\n"
-            code += "goto " + "label_" + NT + "_" + str(i) + ";\n"
+            code += "goto " + "label_" + process_word(NT) + "_" + str(i) + ";\n"
             code += "}\n"
-        code += "add_action(\""+ NT + "_" + str(i)+"\");\n"
+        code += "add_action(\""+ process_word(NT) + "_" + str(i)+"\");\n"
         code += "return res;"
         code += "}"
-        code += "label_" + NT + "_" + str(i) + ":\n"
+        code += "label_" + process_word(NT) + "_" + str(i) + ":\n"
     code += "return res;\n}"
     return code
 
@@ -165,7 +169,7 @@ def gen_actions(rules):
     for rule in rules:
         NT = rule[0]
         for i in range(1,len(rule)):
-            code += "\nvoid action_" + NT + "_" + str(i) + "(void){\n"
+            code += "\nvoid action_" + process_word(NT) + "_" + str(i) + "(void){\n"
             code += "\t"+rule[i][1]+"\n"
             code +="}"
     return code
@@ -192,7 +196,7 @@ def gen_actionneur(rules):
     for rule in rules:
         NT = rule[0]
         for i in range(1,len(rule)):
-            code += """if (strcmp(tab_actions[i],\"""" + NT + "_" + str(i) + "\") == 0){" + rule[i][1] +"}"
+            code += """if (strcmp(tab_actions[i],\"""" + process_word(NT) + "_" + str(i) + "\") == 0){" + rule[i][1] +"}"
     code +=  """
         }
     }
@@ -265,14 +269,6 @@ except:
     output_name = "parser"
 
 rules = read_grammar(filename)
-
-#On vérifie que _ n'est pas utilisé dans les non-terminaux
-for rule in rules:
-    NT = rule[0]
-    for c in NT:
-        if c == "_":
-            print("The character _ cannot be used inside the name of a non-terminal.")
-            sys.exit()
 
 #### Génération du code des fichiers .c et .h
 ###Génération du code .c

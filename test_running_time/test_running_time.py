@@ -7,7 +7,7 @@ import time
 def test_speed(path_grammaire, path_words):
     print("\n--- Test on grammar of "+path_grammaire+" ---")
     
-    os.system('python ../gen.py '+path_grammaire)                 # Génération du code C du parser sur la grammaire en argument
+    os.system('python3 ../gen.py '+path_grammaire)                 # Génération du code C du parser sur la grammaire en argument
 
     os.system('gcc parser.c -o parserToTest')                     # Compilation du parser
 
@@ -55,3 +55,6 @@ test_speed("./grammaires/g_test4.txt","./grammaires/words/g_test4_words.txt")
 
 # Grammaire 5
 test_speed("./grammaires/g_test5.txt","./grammaires/words/g_test5_words.txt")
+
+# Grammaire 6
+test_speed("./grammaires/g_test6.txt","./grammaires/words/g_test6_words.txt")
