@@ -12,6 +12,8 @@
   * [Analyser un mot](#analyser-un-mot)
 - [Précisions techniques](#précisions-techniques)
 - [Tests effectués et performances](#tests-effectués-et-performances)
+  * [Lancement des tests](#lancement-des-tests)
+  * [Fonctionnement des tests](#fonctionnement-des-tests)
 - [Limites](#limites)
 
 
@@ -91,6 +93,7 @@ Sinon, **KO** s'affiche.
  - Les actions ne s'effectuent que si le mot est reconnu. 
 
 ## Tests effectués et performances
+### Lancement des tests
 Pour lancer les tests : 
 
     cd test_running_time/
@@ -99,8 +102,8 @@ Pour lancer les tests :
 ou alors, depuis la racine du projet :
 
     make test
-
-Dans le répertoire test_running_time, le script python test_running_time.py appelle une fonction générant un parser pour une grammaire donnée et exécutant ce parser avec les mots donnés. Pour chacun de ces mots, le temps d'exécution, le résultat attendu et le résultat obtenu sont affichés.
+### Fonctionnement des tests
+Dans le répertoire test_running_time, le script python test_running_time.py appelle une fonction générant un parser pour une grammaire donnée et exécutant ce parser avec les mots donnés (situés respectivement dans les dossiers /test_running_time/grammaires et /test_running_time/grammaires/words). Pour chacun de ces mots, le temps d'exécution, le résultat attendu et le résultat obtenu sont affichés.
 L'appel de l’exécutable par l’interpréteur python semble prendre la majorité du temps, car peu importe la grammaire ou la longueur du mot à reconnaître le temps d'exécution reste similaire (cf capture d'écran ci-dessous)
 ![Capture d'écran de l'exécution du script test_running_time.py](/images/screenshot_running_time.JPG)
 
