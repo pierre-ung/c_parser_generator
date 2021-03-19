@@ -95,6 +95,10 @@ Pour lancer les tests :
 
     cd test_running_time/
     python3 test_running_time.py
+    
+ou alors, depuis la racine du projet :
+
+    make test
 
 Dans le répertoire test_running_time, le script python test_running_time.py appelle une fonction générant un parser pour une grammaire donnée et exécutant ce parser avec les mots donnés. Pour chacun de ces mots, le temps d'exécution, le résultat attendu et le résultat obtenu sont affichés.
 L'appel de l’exécutable par l’interpréteur python semble prendre la majorité du temps, car peu importe la grammaire ou la longueur du mot à reconnaître le temps d'exécution reste similaire (cf capture d'écran ci-dessous)
