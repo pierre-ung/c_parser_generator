@@ -37,9 +37,12 @@ def read_grammar(filename):
             rule = rule.split(":")
             for i in range(len(rule)):
                 rule[i] = rule[i].strip()
-            #epsilon production=
+            #epsilon production
             if(len(rule[1]) == 0):
-                rule = [rule[0], " "]
+                try:
+                    rule = [rule[0], " ", rule[2]]
+                except:
+                    rule = [rule[0], " "]
             rules_couple.append(rule)
     return merge_tuples(rules_couple)
 
