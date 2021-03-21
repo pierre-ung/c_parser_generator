@@ -111,6 +111,5 @@ L'appel de l’exécutable par l’interpréteur python semble prendre la majori
 
 ## Limites
 
- - Lorsque l'on spécifie un mot à analyser, il faut exactement un espace entre les terminaux
  - Pas de backtracking
  - Pas de prise en charge de la récursivité gauche indirecte
