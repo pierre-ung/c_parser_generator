@@ -62,8 +62,49 @@ def merge_tuples(tuples):
                     tmp_tuple.append([t[1], ""])
         res.append(tmp_tuple)
     # Suppression des tuples dupliqués puis retour des tuples fusionnés
-    #print(del_left_rec([i for n, i in enumerate(res) if i not in res[:n]]))
+    print(del_left_rec([i for n, i in enumerate(res) if i not in res[:n]]))
     return del_left_rec([i for n, i in enumerate(res) if i not in res[:n]])
+
+def del_unreachable(liste):
+    fini = False
+    while not fini:
+        new_liste = []
+        fini = True
+        NT_utilises = [liste[0][0]]
+        for rules in liste:
+            for rule in rules[1:]:
+                for e in rule[0].split():
+                    if e.strip()[0].isupper():
+                        NT_utilises.append(e.strip())
+        for rules in liste:
+            if rules[0] in NT_utilises:
+                new_liste.append(rules)
+            else:
+                fini = False
+        liste = new_liste
+    return liste
+
+def del_unit(liste): #Peut créer des règles inaccessibles et des conflits en C
+    fini = False
+    while not fini:
+        fini = True
+        liste_terminaux = [liste[i][0] for i in range(len(liste))]
+        new_list = []
+        for rules in liste:
+            NT = rules[0]
+            new_rules = [NT]
+            for rule in rules[1:]:
+                if rule[0].strip() in liste_terminaux:
+                    fini = False
+                    index = liste_terminaux.index(rule[0].strip())
+                    for rule2 in liste[index][1:]:
+                        new_rule = [rule2[0], rule[1]+rule2[1]]
+                        new_rules.append(new_rule)
+                else:
+                    new_rules.append(rule)
+            new_list.append(new_rules)
+        liste = new_list
+    return liste
 
 def del_useless(liste):
     fini = False
@@ -94,6 +135,8 @@ def del_useless(liste):
 def del_left_rec(liste):
 
     liste = del_useless(liste)
+    #liste = del_unit(liste)
+    liste = del_unreachable(liste)
     new_rules = []
     liste_terminaux = [liste[i][0] for i in range(len(liste))]
     free_terminals = []
