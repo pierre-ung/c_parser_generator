@@ -41,7 +41,7 @@ Pour spécifier une grammaire, il faut rédiger la grammaire dans un fichier tex
     NT : NT2 [: Action]
     NT2 : a b [: Action]
     ect... 
-**L'axiome** de la grammaire est le terminal de la **première règle** décrite (ici, NT).
+**L'axiome** de la grammaire est le terminal de la **première règle** décrite (ici, NT). Les non-terminaux commencent par une majuscule, les terminaux sont en minuscule. Laisser vide la partie droite (ou centrale, si une action est précisée) d'une règle en fait une epsilon-production (voir la dernière règle de l'exemple ci-dessous).
 Exemple de grammaire à fournir en entrée :
 
     S : a S b : printf("S");
@@ -82,14 +82,14 @@ Ensuite, compilez le fichier C généré :
 Pour lancer le parser généré sur un mot à analyser :
 
     ./nom_executable <mot à analyser>
-Si le mot appartient au langage engendré par la grammaire, **OK** s'affiche, et les actions précisées pour chaque règle sont effectuées.
+Si le mot appartient au langage engendré par la grammaire, les actions précisées pour chaque règle sont effectuées, et **OK** s'affiche.
 Sinon, **KO** s'affiche. 
 
 ## Précisions techniques
 
- - Dans le script Python, nous modifions la grammaire pour y supprimer les récursivités gauches directes et les règles inutiles (sans changer le langage engendré).
+ - Dans le script Python, nous modifions la grammaire pour y supprimer les récursivités gauches directes et indirectes, ainsi que les règles inutiles (sans changer le langage engendré). La suppression des récursivités gauches indirecte ne fonctionne cependant pas toujours, et le programmme C généré peut ne pas fonctionner si la grammaire en entrée en contient.
  - Afin d'analyser un mot, il est séparé en un tableau de chaînes de caractères, correspondants aux terminaux séparés par un espace.
- - Pour l'analyse d'un mot, on dispose d'un curseur (analyse_index) indiquant la progression de l'analyse.
+ - Pour l'analyse d'un mot, on dispose d'un curseur (analyse_index) indiquant la progression de l'analyse, ainsi que d'une variable (actions) représentant la série des actions à effectuer.
  - Les actions ne s'effectuent que si le mot est reconnu. 
 
 ## Tests effectués et performances
@@ -111,5 +111,6 @@ L'appel de l’exécutable par l’interpréteur python semble prendre la majori
 
 ## Limites
 
- - Pas de backtracking
- - Pas de prise en charge de la récursivité gauche indirecte
+ - Pas de backtracking, le programme C peut ne pas reconnaitre un mot du langage.
+ - Prise en charge de la récursivité gauche indirecte limitée, le programme C peut ne pas fonctionner si une grammmaire en contient.
+ - L'ordre dans lequel les actions s'exécutent n'est pas toujours prévisible.
